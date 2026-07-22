@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment } from "@react-three/drei";
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, type ReactElement } from "react";
 import type { Square } from "chess.js";
 import { Chess } from "chess.js";
 
@@ -103,7 +103,7 @@ function Pieces({
   onSquareClick: (sq: Square) => void;
 }) {
   const chess = useMemo(() => new Chess(fen), [fen]);
-  const meshes: JSX.Element[] = [];
+  const meshes: ReactElement[] = [];
   const board = chess.board();
   for (let r = 0; r < 8; r++) {
     for (let f = 0; f < 8; f++) {
