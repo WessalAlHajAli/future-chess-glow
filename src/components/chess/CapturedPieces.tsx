@@ -53,7 +53,7 @@ function Row({
       <span className="text-xs text-muted-foreground">{label}</span>
       <div className="flex min-h-6 flex-wrap gap-0.5 text-xl leading-none">
         {pieces.length === 0 ? (
-          <span className="text-xs text-muted-foreground/60">\u2014</span>
+          <span className="text-xs text-muted-foreground/60">—</span>
         ) : (
           pieces.map((p, i) => (
             <span key={i} className={opp === "w" ? "text-amber-100" : "text-zinc-800"}>
