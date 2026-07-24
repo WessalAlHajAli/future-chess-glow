@@ -1,6 +1,43 @@
 import { Chess, type Move } from "chess.js";
 
-export type Difficulty = "easy" | "medium" | "hard" | "master";
+export type Difficulty =
+  | "beginner"
+  | "easy"
+  | "medium"
+  | "hard"
+  | "expert"
+  | "master"
+  | "grandmaster";
+
+export const DIFFICULTY_ORDER: Difficulty[] = [
+  "beginner",
+  "easy",
+  "medium",
+  "hard",
+  "expert",
+  "master",
+  "grandmaster",
+];
+
+export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  beginner: "Beginner",
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
+  expert: "Expert",
+  master: "Master",
+  grandmaster: "Grandmaster",
+};
+
+export const DIFFICULTY_ELO: Record<Difficulty, number> = {
+  beginner: 600,
+  easy: 900,
+  medium: 1250,
+  hard: 1550,
+  expert: 1850,
+  master: 2100,
+  grandmaster: 2400,
+};
 
 // Simple material values for evaluation.
 const PIECE_VALUES: Record<string, number> = {
@@ -89,27 +126,38 @@ function negamax(
 
 function depthFor(difficulty: Difficulty): number {
   switch (difficulty) {
+    case "beginner":
+      return 1;
     case "easy":
       return 1;
     case "medium":
       return 2;
     case "hard":
+      return 2;
+    case "expert":
       return 3;
     case "master":
+      return 3;
+    case "grandmaster":
       return 4;
   }
 }
 
 function randomness(difficulty: Difficulty): number {
-  // Probability of picking a random legal move instead of best move.
   switch (difficulty) {
+    case "beginner":
+      return 0.9;
     case "easy":
-      return 0.7;
+      return 0.6;
     case "medium":
-      return 0.25;
+      return 0.35;
     case "hard":
+      return 0.15;
+    case "expert":
       return 0.05;
     case "master":
+      return 0.02;
+    case "grandmaster":
       return 0;
   }
 }

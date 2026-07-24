@@ -3,10 +3,16 @@ import { Chess, type Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
 import type { GameState } from "../../hooks/use-chess-game";
+import {
+  BOARD_COLORS,
+  animationDurationMs,
+  type Preferences,
+} from "../../lib/chess-preferences";
 
 interface Props {
   state: GameState;
   onSquareClick: (square: Square) => void;
+  prefs: Preferences;
 }
 
 function findKingSquare(fen: string, color: "w" | "b"): Square | null {
@@ -23,7 +29,7 @@ function findKingSquare(fen: string, color: "w" | "b"): Square | null {
   return null;
 }
 
-export function ChessBoard2D({ state, onSquareClick }: Props) {
+export function ChessBoard2D({ state, onSquareClick, prefs }: Props) {
   const checkSquare = useMemo<Square | null>(() => {
     if (state.status !== "check" && state.status !== "checkmate") return null;
     return findKingSquare(state.fen, state.turn);
@@ -31,7 +37,7 @@ export function ChessBoard2D({ state, onSquareClick }: Props) {
 
   const squareStyles = useMemo(() => {
     const styles: Record<string, React.CSSProperties> = {};
-    if (state.lastMove) {
+    if (state.lastMove && prefs.highlightMoves) {
       const hi = "inset 0 0 0 9999px rgba(242, 180, 92, 0.28)";
       styles[state.lastMove.from] = { boxShadow: hi };
       styles[state.lastMove.to] = { boxShadow: hi };
@@ -42,17 +48,19 @@ export function ChessBoard2D({ state, onSquareClick }: Props) {
           "inset 0 0 0 3px rgba(242, 180, 92, 0.9), inset 0 0 24px rgba(242, 180, 92, 0.35)",
       };
     }
-    for (const sq of state.legalTargets) {
-      const isCapture = new Chess(state.fen).get(sq as Square);
-      styles[sq] = isCapture
-        ? {
-            background:
-              "radial-gradient(circle, transparent 55%, rgba(242,180,92,0.55) 58%, rgba(242,180,92,0.55) 68%, transparent 71%)",
-          }
-        : {
-            background:
-              "radial-gradient(circle, rgba(242,180,92,0.55) 22%, transparent 24%)",
-          };
+    if (prefs.showLegalMoves) {
+      for (const sq of state.legalTargets) {
+        const isCapture = new Chess(state.fen).get(sq as Square);
+        styles[sq] = isCapture
+          ? {
+              background:
+                "radial-gradient(circle, transparent 55%, rgba(242,180,92,0.55) 58%, rgba(242,180,92,0.55) 68%, transparent 71%)",
+            }
+          : {
+              background:
+                "radial-gradient(circle, rgba(242,180,92,0.55) 22%, transparent 24%)",
+            };
+      }
     }
     if (checkSquare) {
       styles[checkSquare] = {
@@ -61,7 +69,31 @@ export function ChessBoard2D({ state, onSquareClick }: Props) {
       };
     }
     return styles;
-  }, [state.selected, state.legalTargets, state.lastMove, state.fen, checkSquare]);
+  }, [
+    state.selected,
+    state.legalTargets,
+    state.lastMove,
+    state.fen,
+    checkSquare,
+    prefs.highlightMoves,
+    prefs.showLegalMoves,
+  ]);
+
+  const boardColors = BOARD_COLORS[prefs.boardColor];
+  const baseOrientation: "w" | "b" =
+    prefs.boardOrientation === "auto"
+      ? state.playerColor
+      : prefs.boardOrientation === "white"
+        ? "w"
+        : "b";
+  const orientation: "white" | "black" = state.boardFlipped
+    ? baseOrientation === "w"
+      ? "black"
+      : "white"
+    : baseOrientation === "w"
+      ? "white"
+      : "black";
+  const animMs = animationDurationMs(prefs.animationSpeed);
 
   return (
     <div className="chess-frame relative mx-auto w-full">
@@ -69,16 +101,16 @@ export function ChessBoard2D({ state, onSquareClick }: Props) {
         <Chessboard
           options={{
             position: state.fen,
-            boardOrientation: state.playerColor === "w" ? "white" : "black",
-            animationDurationInMs: 220,
-            showAnimations: true,
+            boardOrientation: orientation,
+            animationDurationInMs: animMs,
+            showAnimations: animMs > 0,
             allowDragging: false,
-            showNotation: true,
+            showNotation: prefs.showCoordinates,
             onSquareClick: ({ square }) => onSquareClick(square as Square),
             onPieceClick: ({ square }) => onSquareClick(square as Square),
             squareStyles,
-            darkSquareStyle: { backgroundColor: "#2b241d" },
-            lightSquareStyle: { backgroundColor: "#e9dcc0" },
+            darkSquareStyle: { backgroundColor: boardColors.dark },
+            lightSquareStyle: { backgroundColor: boardColors.light },
             boardStyle: {
               borderRadius: "6px",
               overflow: "hidden",
