@@ -1,7 +1,13 @@
 import { Chess, type Move, type Square } from "chess.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { pickAiMoveAsync, type Difficulty } from "../lib/chess-ai";
+import { type Difficulty } from "../lib/chess-ai";
+import {
+  analyzePosition,
+  bestHint,
+  chooseMove,
+  isStockfishAvailable,
+} from "../lib/stockfish-engine";
 
 export type PlayerColor = "w" | "b";
 
@@ -37,7 +43,11 @@ export interface GameState {
   legalTargets: Square[];
   lastMove: { from: Square; to: Square } | null;
   lastMoveKind: MoveKind;
-  evaluation: number;
+  evaluation: number; // whole-pawn score (white-positive) for display
+  engineCp: number | null; // centipawns from white's perspective (Stockfish)
+  engineMate: number | null;
+  engineDepth: number | null;
+  engineName: string; // "Stockfish" | "AI Engine"
   pendingPromotion: { from: Square; to: Square } | null;
   canUndo: boolean;
   canRedo: boolean;
@@ -123,6 +133,21 @@ export function useChessGame() {
   } | null>(null);
   const [resigned, setResigned] = useState<PlayerColor | null>(null);
   const [agreedDraw, setAgreedDraw] = useState<string | null>(null);
+  const [engineCp, setEngineCp] = useState<number | null>(null);
+  const [engineMate, setEngineMate] = useState<number | null>(null);
+  const [engineDepth, setEngineDepth] = useState<number | null>(null);
+  const [engineName, setEngineName] = useState<string>("AI Engine");
+
+  // Kick off engine load once so it's warm by the time AI needs to move.
+  useEffect(() => {
+    let cancelled = false;
+    isStockfishAvailable().then((ok) => {
+      if (!cancelled) setEngineName(ok ? "Stockfish" : "AI Engine");
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const rerender = useCallback(() => setTick((t) => t + 1), []);
 
@@ -163,6 +188,10 @@ export function useChessGame() {
       lastMove,
       lastMoveKind,
       evaluation: computeEvaluation(chess),
+      engineCp,
+      engineMate,
+      engineDepth,
+      engineName,
       pendingPromotion,
       canUndo: history.length > 0 && !isThinking,
       canRedo: redoStackRef.current.length > 0 && !isThinking,
@@ -180,6 +209,10 @@ export function useChessGame() {
     pendingPromotion,
     resigned,
     agreedDraw,
+    engineCp,
+    engineMate,
+    engineDepth,
+    engineName,
   ]);
 
   const applyMove = useCallback(
@@ -256,16 +289,35 @@ export function useChessGame() {
     let cancelled = false;
     setIsThinking(true);
     (async () => {
-      const mv = await pickAiMoveAsync(chess.fen(), difficulty);
-      if (cancelled || !mv) {
+      const result = await chooseMove(chess.fen(), difficulty);
+      if (cancelled || !result) {
         setIsThinking(false);
         return;
       }
       try {
-        const applied = chess.move(mv);
-        setLastMove({ from: mv.from as Square, to: mv.to as Square });
+        const applied = chess.move({
+          from: result.move.from,
+          to: result.move.to,
+          promotion: result.move.promotion,
+        });
+        setLastMove({
+          from: result.move.from as Square,
+          to: result.move.to as Square,
+        });
         setLastMoveKind(kindOf(applied, chess));
         redoStackRef.current = [];
+        // Engine reports cp from side-to-move BEFORE the move; convert to
+        // white-positive for display.
+        if (result.cp != null) {
+          const whiteCp = applied?.color === "w" ? result.cp : -result.cp;
+          setEngineCp(whiteCp);
+          setEngineMate(null);
+        } else if (result.mate != null) {
+          const whiteMate = applied?.color === "w" ? result.mate : -result.mate;
+          setEngineMate(whiteMate);
+          setEngineCp(null);
+        }
+        if (result.depth != null) setEngineDepth(result.depth);
       } catch {
         /* noop */
       }
@@ -276,6 +328,37 @@ export function useChessGame() {
       cancelled = true;
     };
   }, [tick, playerColor, difficulty, pendingPromotion, resigned, agreedDraw, rerender]);
+
+  // Live evaluation on the player's turn: run a shallow engine analysis in the
+  // background whenever the position changes and it's the player's move.
+  useEffect(() => {
+    const chess = chessRef.current;
+    if (resigned || agreedDraw) return;
+    if (chess.isGameOver()) return;
+    if (chess.turn() !== playerColor) return;
+    let cancelled = false;
+    (async () => {
+      const startFen = chess.fen();
+      const result = await analyzePosition(startFen);
+      if (cancelled || !result) return;
+      // Guard: only accept if the position hasn't changed since we asked.
+      if (chessRef.current.fen() !== startFen) return;
+      const stm = startFen.split(" ")[1] as "w" | "b";
+      if (result.cp != null) {
+        const whiteCp = stm === "w" ? result.cp : -result.cp;
+        setEngineCp(whiteCp);
+        setEngineMate(null);
+      } else if (result.mate != null) {
+        const whiteMate = stm === "w" ? result.mate : -result.mate;
+        setEngineMate(whiteMate);
+        setEngineCp(null);
+      }
+      if (result.depth != null) setEngineDepth(result.depth);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [tick, playerColor, resigned, agreedDraw]);
 
   const newGame = useCallback(
     (opts?: { playerColor?: PlayerColor; difficulty?: Difficulty }) => {
@@ -291,6 +374,9 @@ export function useChessGame() {
       setAgreedDraw(null);
       setIsThinking(false);
       setBoardFlipped(false);
+      setEngineCp(null);
+      setEngineMate(null);
+      setEngineDepth(null);
       rerender();
     },
     [rerender],
@@ -373,9 +459,12 @@ export function useChessGame() {
   const hint = useCallback(async (): Promise<{ from: Square; to: Square } | null> => {
     const chess = chessRef.current;
     if (chess.turn() !== playerColor || chess.isGameOver()) return null;
-    const mv = await pickAiMoveAsync(chess.fen(), "expert");
-    if (!mv) return null;
-    return { from: mv.from as Square, to: mv.to as Square };
+    const result = await bestHint(chess.fen());
+    if (!result) return null;
+    return {
+      from: result.move.from as Square,
+      to: result.move.to as Square,
+    };
   }, [playerColor]);
 
   const exportPgn = useCallback(() => chessRef.current.pgn(), []);
