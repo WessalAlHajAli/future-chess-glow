@@ -172,7 +172,7 @@ export function ChessGame() {
       <DifficultyBar difficulty={state.difficulty} onChange={handleDifficultyChange} />
       <CapturedPieces captured={state.captured} />
       <MoveHistory moves={state.history} />
-      <EvaluationBar score={state.evaluation} />
+      <EvaluationBar score={state.evaluation} engineCp={state.engineCp} engineMate={state.engineMate} engineDepth={state.engineDepth} engineName={state.engineName} thinking={state.isThinking} />
     </div>
   );
 
@@ -282,7 +282,7 @@ export function ChessGame() {
             <GameInfoPanel state={state} />
             <CapturedPieces captured={state.captured} />
             <MoveHistory moves={state.history} />
-            <EvaluationBar score={state.evaluation} />
+            <EvaluationBar score={state.evaluation} engineCp={state.engineCp} engineMate={state.engineMate} engineDepth={state.engineDepth} engineName={state.engineName} thinking={state.isThinking} />
           </aside>
 
           {/* Desktop (xl+) right column */}
@@ -295,7 +295,7 @@ export function ChessGame() {
             <CapturedPieces captured={state.captured} />
             <MoveHistory moves={state.history} />
             <div className="sm:col-span-2">
-              <EvaluationBar score={state.evaluation} />
+              <EvaluationBar score={state.evaluation} engineCp={state.engineCp} engineMate={state.engineMate} engineDepth={state.engineDepth} engineName={state.engineName} thinking={state.isThinking} />
             </div>
           </div>
         </div>
