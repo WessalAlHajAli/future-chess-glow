@@ -161,3 +161,48 @@
     box-shadow: 0 0 40px -8px oklch(0.82 0.15 72 / 0.35), 0 0 0 1px oklch(0.82 0.15 72 / 0.15);
   }
 }
+
+@layer components {
+  /* Premium 2D chessboard gold frame */
+  .chess-frame {
+    padding: 14px;
+    border-radius: 14px;
+    background:
+      linear-gradient(145deg, #a8813a 0%, #f5d98a 25%, #c9a34c 50%, #f5d98a 75%, #8a672b 100%);
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.6),
+      0 0 48px -6px rgba(242, 180, 92, 0.45),
+      0 0 120px -20px rgba(242, 180, 92, 0.35),
+      0 20px 40px -12px rgba(0, 0, 0, 0.65),
+      inset 0 1px 0 rgba(255, 235, 190, 0.6),
+      inset 0 -1px 0 rgba(60, 40, 10, 0.6);
+    position: relative;
+    animation: chess-frame-glow 4.5s ease-in-out infinite;
+  }
+  .chess-frame-inner {
+    border-radius: 6px;
+    padding: 6px;
+    background: linear-gradient(160deg, #14100a, #1c1610 60%, #100c08);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(0, 0, 0, 0.6);
+  }
+  @keyframes chess-frame-glow {
+    0%, 100% {
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.6),
+        0 0 48px -6px rgba(242, 180, 92, 0.45),
+        0 0 120px -20px rgba(242, 180, 92, 0.35),
+        0 20px 40px -12px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 235, 190, 0.6),
+        inset 0 -1px 0 rgba(60, 40, 10, 0.6);
+    }
+    50% {
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.6),
+        0 0 60px -4px rgba(242, 180, 92, 0.6),
+        0 0 160px -18px rgba(242, 180, 92, 0.5),
+        0 20px 40px -12px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 235, 190, 0.7),
+        inset 0 -1px 0 rgba(60, 40, 10, 0.6);
+    }
+  }
+}
