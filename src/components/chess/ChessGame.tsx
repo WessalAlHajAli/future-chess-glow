@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Menu } from "lucide-react";
 
 import { useChessGame } from "../../hooks/use-chess-game";
-import { ChessBoard3D } from "./ChessBoard3D";
+import { ChessBoard2D } from "./ChessBoard2D";
 import { PlayerPanel } from "./PlayerPanel";
 import { MoveHistory } from "./MoveHistory";
 import { CapturedPieces } from "./CapturedPieces";
@@ -151,8 +151,8 @@ export function ChessGame() {
           </div>
 
           <div className="relative w-full">
-            <div className="mx-auto aspect-square w-full max-w-[min(88vh,720px)] overflow-hidden rounded-3xl border border-border bg-black/60 amber-glow">
-              <ChessBoard3D state={state} onSquareClick={selectSquare} />
+            <div className="mx-auto w-full max-w-[min(88vh,720px)]">
+              <ChessBoard2D state={state} onSquareClick={selectSquare} />
             </div>
             <GameOverBanner
               state={state}
