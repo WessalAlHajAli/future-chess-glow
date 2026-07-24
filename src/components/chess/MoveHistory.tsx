@@ -17,28 +17,32 @@ export function MoveHistory({ moves }: Props) {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card/80 p-4 backdrop-blur-sm">
+    <div className="panel animate-fade-in p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">Move History</h3>
-        <span className="text-xs text-muted-foreground">{moves.length} moves</span>
+        <h3 className="text-[11px] font-medium uppercase tracking-[0.3em] text-primary/80">
+          Move History
+        </h3>
+        <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          {moves.length}
+        </span>
       </div>
-      <ScrollArea className="h-48">
+      <ScrollArea className="h-40">
         {pairs.length === 0 ? (
-          <p className="py-6 text-center text-xs text-muted-foreground">
+          <p className="py-4 text-center text-xs text-muted-foreground">
             No moves yet.
           </p>
         ) : (
-          <ol className="space-y-1 pr-3 font-mono text-sm">
+          <ol className="space-y-1 pr-3 font-mono text-xs">
             {pairs.map((p) => (
               <li
                 key={p.number}
-                className="grid grid-cols-[2.2rem_1fr_1fr] items-center gap-2"
+                className="grid grid-cols-[2rem_1fr_1fr] items-center gap-2"
               >
-                <span className="text-xs text-muted-foreground">{p.number}.</span>
-                <span className="rounded px-2 py-0.5 text-foreground hover:bg-muted/60">
+                <span className="text-primary/60">{p.number}.</span>
+                <span className="rounded px-2 py-0.5 text-foreground/95 hover:bg-primary/10">
                   {p.white?.san ?? ""}
                 </span>
-                <span className="rounded px-2 py-0.5 text-muted-foreground hover:bg-muted/60">
+                <span className="rounded px-2 py-0.5 text-muted-foreground hover:bg-primary/10">
                   {p.black?.san ?? ""}
                 </span>
               </li>

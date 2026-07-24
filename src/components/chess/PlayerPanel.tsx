@@ -1,4 +1,4 @@
-import { Bot, User } from "lucide-react";
+import { Bot, Star, User } from "lucide-react";
 
 interface Props {
   side: "player" | "ai";
@@ -19,39 +19,33 @@ export function PlayerPanel({
 }: Props) {
   const Icon = side === "player" ? User : Bot;
   return (
-    <div
-      className={`relative rounded-2xl border bg-card/80 p-4 backdrop-blur-sm transition-all ${
-        isTurn ? "border-primary/60 amber-glow" : "border-border"
-      }`}
-    >
-      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
-        <div
-          className={`grid h-12 w-12 shrink-0 place-items-center rounded-xl ${
-            side === "player"
-              ? "bg-gradient-to-br from-amber-300/20 to-amber-600/20 text-primary"
-              : "bg-gradient-to-br from-zinc-500/20 to-zinc-800/40 text-muted-foreground"
-          }`}
-        >
-          <Icon className="h-6 w-6" />
-        </div>
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="truncate font-semibold text-foreground">{name}</p>
-            {isTurn && (
-              <span className="inline-flex h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-primary" />
-            )}
-          </div>
-          <p className="truncate text-xs text-muted-foreground">
-            {isThinking ? "Thinking\u2026" : subtitle}
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="font-mono text-lg tabular-nums text-foreground">{clock}</p>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-            Clock
-          </p>
-        </div>
+    <div className="panel animate-fade-in flex flex-col items-center gap-3 p-5 text-center">
+      <div
+        className={`grid h-20 w-20 place-items-center rounded-full border-2 transition-all ${
+          isTurn
+            ? "border-primary animate-glow-pulse"
+            : "border-primary/40"
+        }`}
+      >
+        <Icon className="h-9 w-9 text-primary/85" strokeWidth={1.6} />
       </div>
+      <div>
+        <p className="font-serif text-xl font-medium text-foreground">{name}</p>
+        <p className="mt-0.5 inline-flex items-center gap-1 text-xs uppercase tracking-widest text-muted-foreground">
+          {subtitle}
+          <Star className="h-3 w-3 fill-primary text-primary" />
+        </p>
+      </div>
+      <div className="mt-1 w-full rounded-md border border-primary/25 bg-black/40 px-4 py-2 text-center">
+        <p className="font-mono text-2xl tracking-widest text-primary tabular-nums">
+          {clock}
+        </p>
+      </div>
+      {isThinking && (
+        <p className="text-[11px] uppercase tracking-widest text-primary/70">
+          Thinking&hellip;
+        </p>
+      )}
     </div>
   );
 }

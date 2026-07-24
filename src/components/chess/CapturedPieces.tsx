@@ -20,20 +20,21 @@ function materialAdvantage(captured: { w: string[]; b: string[] }): number {
 export function CapturedPieces({ captured }: Props) {
   const adv = materialAdvantage(captured);
   return (
-    <div className="rounded-2xl border border-border bg-card/80 p-4 backdrop-blur-sm">
-      <h3 className="mb-3 text-sm font-semibold text-foreground">Captured</h3>
+    <div className="panel animate-fade-in p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-[11px] font-medium uppercase tracking-[0.3em] text-primary/80">
+          Captured
+        </h3>
+        {adv !== 0 && (
+          <span className={`text-xs font-semibold ${adv > 0 ? "text-primary" : "text-destructive"}`}>
+            {adv > 0 ? `+${adv}` : adv}
+          </span>
+        )}
+      </div>
       <div className="space-y-2">
         <Row label="You" color="w" pieces={sortPieces(captured.w)} />
         <Row label="AI" color="b" pieces={sortPieces(captured.b)} />
       </div>
-      {adv !== 0 && (
-        <p className="mt-3 text-xs text-muted-foreground">
-          Material:{" "}
-          <span className={adv > 0 ? "font-medium text-primary" : "font-medium text-destructive"}>
-            {adv > 0 ? `+${adv}` : adv}
-          </span>
-        </p>
-      )}
     </div>
   );
 }
