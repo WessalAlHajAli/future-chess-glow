@@ -1,7 +1,5 @@
-import { Flag, Lightbulb, RotateCcw, Settings, Undo2 } from "lucide-react";
+import { Flag, Lightbulb, Plus, Settings, Undo2 } from "lucide-react";
 import type { ReactNode } from "react";
-
-import { Button } from "../ui/button";
 
 interface Props {
   onNewGame: () => void;
@@ -21,32 +19,12 @@ export function GameControls({
   disabled,
 }: Props) {
   return (
-    <div className="grid grid-cols-5 gap-1 rounded-2xl border border-border bg-card/80 p-2 backdrop-blur-sm sm:gap-2">
-      <ControlButton icon={<RotateCcw className="h-4 w-4" />} label="New" onClick={onNewGame} />
-      <ControlButton
-        icon={<Undo2 className="h-4 w-4" />}
-        label="Undo"
-        onClick={onUndo}
-        disabled={disabled}
-      />
-      <ControlButton
-        icon={<Lightbulb className="h-4 w-4" />}
-        label="Hint"
-        onClick={onHint}
-        disabled={disabled}
-      />
-      <ControlButton
-        icon={<Settings className="h-4 w-4" />}
-        label="Settings"
-        onClick={onSettings}
-      />
-      <ControlButton
-        icon={<Flag className="h-4 w-4" />}
-        label="Resign"
-        onClick={onResign}
-        destructive
-        disabled={disabled}
-      />
+    <div className="grid grid-cols-5 gap-2 sm:gap-3">
+      <ControlButton icon={<Plus className="h-5 w-5" />} label="New Game" onClick={onNewGame} />
+      <ControlButton icon={<Undo2 className="h-5 w-5" />} label="Undo" onClick={onUndo} disabled={disabled} />
+      <ControlButton icon={<Lightbulb className="h-5 w-5" />} label="Hint" onClick={onHint} disabled={disabled} />
+      <ControlButton icon={<Settings className="h-5 w-5" />} label="Settings" onClick={onSettings} />
+      <ControlButton icon={<Flag className="h-5 w-5" />} label="Resign" onClick={onResign} destructive disabled={disabled} />
     </div>
   );
 }
@@ -65,18 +43,20 @@ function ControlButton({
   destructive?: boolean;
 }) {
   return (
-    <Button
-      variant="ghost"
+    <button
+      type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`flex h-auto min-h-14 flex-col items-center gap-1 rounded-xl px-2 py-2 text-xs ${
+      className={`group panel flex min-h-24 flex-col items-center justify-center gap-2 px-2 py-4 text-xs uppercase tracking-[0.2em] transition-all disabled:opacity-40 ${
         destructive
-          ? "text-destructive hover:bg-destructive/10 hover:text-destructive"
-          : "hover:bg-muted"
+          ? "text-destructive/90 hover:border-destructive/60 hover:bg-destructive/10"
+          : "text-primary/85 hover:border-primary/60 hover:bg-primary/5 hover:text-primary"
       }`}
     >
-      {icon}
-      <span>{label}</span>
-    </Button>
+      <span className="grid h-9 w-9 place-items-center rounded-full border border-primary/30 bg-black/40 text-primary transition-colors group-hover:border-primary/70">
+        {icon}
+      </span>
+      <span className="font-serif text-[11px]">{label}</span>
+    </button>
   );
 }
