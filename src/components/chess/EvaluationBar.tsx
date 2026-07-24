@@ -31,5 +31,3 @@ export function EvaluationBar({ score }: Props) {
     </div>
   );
 }
-  );
-}
