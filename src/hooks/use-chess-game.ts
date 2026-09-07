@@ -278,7 +278,7 @@ export function useChessGame() {
   const selectSquare = useCallback(
     (square: Square) => {
       const chess = chessRef.current;
-      if (isThinking || resigned) return;
+      if (isThinking || resigned || flagged) return;
       if (chess.turn() !== playerColor) return;
       const piece = chess.get(square);
 
@@ -323,7 +323,7 @@ export function useChessGame() {
   // AI turn effect
   useEffect(() => {
     const chess = chessRef.current;
-    if (resigned || agreedDraw) return;
+    if (resigned || agreedDraw || flagged) return;
     if (chess.isGameOver()) return;
     if (chess.turn() === playerColor) return;
     if (pendingPromotion) return;
@@ -368,13 +368,13 @@ export function useChessGame() {
     return () => {
       cancelled = true;
     };
-  }, [tick, playerColor, difficulty, pendingPromotion, resigned, agreedDraw, rerender]);
+  }, [tick, playerColor, difficulty, pendingPromotion, resigned, agreedDraw, flagged, rerender]);
 
   // Live evaluation on the player's turn: run a shallow engine analysis in the
   // background whenever the position changes and it's the player's move.
   useEffect(() => {
     const chess = chessRef.current;
-    if (resigned || agreedDraw) return;
+    if (resigned || agreedDraw || flagged) return;
     if (chess.isGameOver()) return;
     if (chess.turn() !== playerColor) return;
     let cancelled = false;
@@ -399,7 +399,7 @@ export function useChessGame() {
     return () => {
       cancelled = true;
     };
-  }, [tick, playerColor, resigned, agreedDraw]);
+  }, [tick, playerColor, resigned, agreedDraw, flagged]);
 
   const newGame = useCallback(
     (opts?: { playerColor?: PlayerColor; difficulty?: Difficulty }) => {
@@ -413,6 +413,8 @@ export function useChessGame() {
       setPendingPromotion(null);
       setResigned(null);
       setAgreedDraw(null);
+      setFlagged(null);
+      setClocks({ w: CLOCK_START_MS, b: CLOCK_START_MS });
       setIsThinking(false);
       setBoardFlipped(false);
       setEngineCp(null);
@@ -446,6 +448,7 @@ export function useChessGame() {
     setPendingPromotion(null);
     setAgreedDraw(null);
     setResigned(null);
+    setFlagged(null);
     rerender();
   }, [isThinking, playerColor, rerender]);
 
@@ -528,6 +531,8 @@ export function useChessGame() {
       setPendingPromotion(null);
       setResigned(null);
       setAgreedDraw(null);
+      setFlagged(null);
+      setClocks({ w: CLOCK_START_MS, b: CLOCK_START_MS });
       setIsThinking(false);
       rerender();
       return { ok: true };
@@ -547,6 +552,8 @@ export function useChessGame() {
         setPendingPromotion(null);
         setResigned(null);
         setAgreedDraw(null);
+        setFlagged(null);
+        setClocks({ w: CLOCK_START_MS, b: CLOCK_START_MS });
         setIsThinking(false);
         rerender();
         return { ok: true };
