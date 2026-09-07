@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Menu, Settings as SettingsIcon } from "lucide-react";
 
-import { useChessGame } from "../../hooks/use-chess-game";
+import { formatClock, useChessGame } from "../../hooks/use-chess-game";
 import { useChessPreferences } from "../../hooks/use-chess-preferences";
 import { ChessBoard2D } from "./ChessBoard2D";
 import { PlayerPanel } from "./PlayerPanel";
@@ -33,6 +33,7 @@ function statusLabel(status: string, turn: "w" | "b", playerColor: "w" | "b") {
   if (status === "stalemate") return "Stalemate";
   if (status === "draw") return "Draw";
   if (status === "resigned") return "Resigned";
+  if (status === "timeout") return "Time out";
   return turn === playerColor ? "Your turn" : "AI's turn";
 }
 
@@ -152,7 +153,8 @@ export function ChessGame() {
         name={playerName}
         subtitle="ELO 1450"
         isTurn={playerTurn}
-        clock="09:45"
+        clock={formatClock(state.clocks[state.playerColor])}
+        lowTime={state.clocks[state.playerColor] <= 30_000}
       />
       {turnPill}
       <GameInfoPanel state={state} />
@@ -167,7 +169,8 @@ export function ChessGame() {
         subtitle={`ELO ${aiElo}`}
         isTurn={!playerTurn}
         isThinking={isAiThinking}
-        clock="10:00"
+        clock={formatClock(state.clocks[state.playerColor === "w" ? "b" : "w"])}
+        lowTime={state.clocks[state.playerColor === "w" ? "b" : "w"] <= 30_000}
       />
       <DifficultyBar difficulty={state.difficulty} onChange={handleDifficultyChange} />
       <CapturedPieces captured={state.captured} />
@@ -242,7 +245,8 @@ export function ChessGame() {
                 subtitle={`ELO ${aiElo}`}
                 isTurn={!playerTurn}
                 isThinking={isAiThinking}
-                clock="10:00"
+                clock={formatClock(state.clocks[state.playerColor === "w" ? "b" : "w"])}
+        lowTime={state.clocks[state.playerColor === "w" ? "b" : "w"] <= 30_000}
               />
             </div>
 
@@ -267,7 +271,8 @@ export function ChessGame() {
                 name={playerName}
                 subtitle="ELO 1450"
                 isTurn={playerTurn}
-                clock="09:45"
+                clock={formatClock(state.clocks[state.playerColor])}
+        lowTime={state.clocks[state.playerColor] <= 30_000}
               />
             </div>
 

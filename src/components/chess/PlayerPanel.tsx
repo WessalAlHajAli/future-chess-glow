@@ -7,6 +7,7 @@ interface Props {
   isTurn: boolean;
   isThinking?: boolean;
   clock?: string;
+  lowTime?: boolean;
 }
 
 export function PlayerPanel({
@@ -16,6 +17,7 @@ export function PlayerPanel({
   isTurn,
   isThinking,
   clock = "10:00",
+  lowTime = false,
 }: Props) {
   const Icon = side === "player" ? User : Bot;
   return (
@@ -36,8 +38,16 @@ export function PlayerPanel({
           <Star className="h-3 w-3 fill-primary text-primary" />
         </p>
       </div>
-      <div className="mt-1 w-full rounded-md border border-primary/25 bg-black/40 px-4 py-2 text-center">
-        <p className="font-mono text-2xl tracking-widest text-primary tabular-nums">
+      <div
+        className={`mt-1 w-full rounded-md border bg-black/40 px-4 py-2 text-center transition-colors ${
+          lowTime ? "border-destructive/60" : isTurn ? "border-primary/60" : "border-primary/25"
+        }`}
+      >
+        <p
+          className={`font-mono text-2xl tracking-widest tabular-nums ${
+            lowTime ? "text-destructive" : "text-primary"
+          }`}
+        >
           {clock}
         </p>
       </div>

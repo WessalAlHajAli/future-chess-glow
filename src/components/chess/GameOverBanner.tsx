@@ -1,4 +1,4 @@
-import { Trophy, Handshake, Flag } from "lucide-react";
+import { Trophy, Handshake, Flag, Timer } from "lucide-react";
 
 import type { GameState } from "../../hooks/use-chess-game";
 import { Button } from "../ui/button";
@@ -13,7 +13,8 @@ export function GameOverBanner({ state, onNewGame }: Props) {
     state.status !== "checkmate" &&
     state.status !== "stalemate" &&
     state.status !== "draw" &&
-    state.status !== "resigned"
+    state.status !== "resigned" &&
+    state.status !== "timeout"
   ) {
     return null;
   }
@@ -27,6 +28,10 @@ export function GameOverBanner({ state, onNewGame }: Props) {
     Icon = Handshake;
     title = state.status === "stalemate" ? "Stalemate" : "Draw";
     subtitle = "The game is a draw.";
+  } else if (state.status === "timeout") {
+    Icon = Timer;
+    title = playerWon ? "AI ran out of time — you win!" : "Out of time — AI wins";
+    subtitle = playerWon ? "The clock decided it." : "Your clock hit zero.";
   } else if (state.status === "resigned") {
     Icon = Flag;
     title = "Resigned";
