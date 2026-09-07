@@ -52,6 +52,17 @@ export interface GameState {
   pendingPromotion: { from: Square; to: Square } | null;
   canUndo: boolean;
   canRedo: boolean;
+  clocks: { w: number; b: number }; // milliseconds remaining
+  flagged: PlayerColor | null; // side that ran out of time
+}
+
+export const CLOCK_START_MS = 10 * 60 * 1000;
+
+export function formatClock(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
 function computeCaptured(history: Move[]) {
