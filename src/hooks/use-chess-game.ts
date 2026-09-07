@@ -239,12 +239,13 @@ export function useChessGame() {
     flagged,
   ]);
 
-  // Chess clock: the side to move burns time until the game ends. Running out
-  // of time loses the game.
+  // Chess clock: it only starts once the first move has actually been played.
+  // The side to move burns time until they move; running out of time loses.
   useEffect(() => {
     const chess = chessRef.current;
     if (resigned || agreedDraw || flagged) return;
     if (chess.isGameOver()) return;
+    if (chess.history().length === 0) return; // idle until the game begins
     const side = chess.turn();
     const id = window.setInterval(() => {
       setClocks((c) => {
@@ -255,6 +256,7 @@ export function useChessGame() {
     }, 200);
     return () => window.clearInterval(id);
   }, [tick, resigned, agreedDraw, flagged]);
+
 
   const applyMove = useCallback(
     (from: Square, to: Square, promotion?: "q" | "r" | "b" | "n") => {
