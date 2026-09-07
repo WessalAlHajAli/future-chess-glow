@@ -18,7 +18,8 @@ export type GameStatus =
   | "checkmate"
   | "stalemate"
   | "draw"
-  | "resigned";
+  | "resigned"
+  | "timeout";
 
 export type MoveKind =
   | "move"
