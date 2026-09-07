@@ -18,7 +18,8 @@ export type GameStatus =
   | "checkmate"
   | "stalemate"
   | "draw"
-  | "resigned";
+  | "resigned"
+  | "timeout";
 
 export type MoveKind =
   | "move"
@@ -51,6 +52,17 @@ export interface GameState {
   pendingPromotion: { from: Square; to: Square } | null;
   canUndo: boolean;
   canRedo: boolean;
+  clocks: { w: number; b: number }; // milliseconds remaining
+  flagged: PlayerColor | null; // side that ran out of time
+}
+
+export const CLOCK_START_MS = 10 * 60 * 1000;
+
+export function formatClock(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
 function computeCaptured(history: Move[]) {
@@ -137,6 +149,11 @@ export function useChessGame() {
   const [engineMate, setEngineMate] = useState<number | null>(null);
   const [engineDepth, setEngineDepth] = useState<number | null>(null);
   const [engineName, setEngineName] = useState<string>("AI Engine");
+  const [clocks, setClocks] = useState<{ w: number; b: number }>({
+    w: CLOCK_START_MS,
+    b: CLOCK_START_MS,
+  });
+  const [flagged, setFlagged] = useState<PlayerColor | null>(null);
 
   // Kick off engine load once so it's warm by the time AI needs to move.
   useEffect(() => {
@@ -158,7 +175,10 @@ export function useChessGame() {
     let finalStatus: GameStatus = status;
     let finalWinner = winner;
     let finalDraw = drawReason;
-    if (resigned) {
+    if (flagged) {
+      finalStatus = "timeout";
+      finalWinner = flagged === "w" ? "b" : "w";
+    } else if (resigned) {
       finalStatus = "resigned";
       finalWinner = resigned === "w" ? "b" : "w";
     } else if (agreedDraw) {
@@ -195,6 +215,8 @@ export function useChessGame() {
       pendingPromotion,
       canUndo: history.length > 0 && !isThinking,
       canRedo: redoStackRef.current.length > 0 && !isThinking,
+      clocks,
+      flagged,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -213,7 +235,26 @@ export function useChessGame() {
     engineMate,
     engineDepth,
     engineName,
+    clocks,
+    flagged,
   ]);
+
+  // Chess clock: the side to move burns time until the game ends. Running out
+  // of time loses the game.
+  useEffect(() => {
+    const chess = chessRef.current;
+    if (resigned || agreedDraw || flagged) return;
+    if (chess.isGameOver()) return;
+    const side = chess.turn();
+    const id = window.setInterval(() => {
+      setClocks((c) => {
+        const next = Math.max(0, c[side] - 200);
+        if (next === 0) setFlagged(side);
+        return { ...c, [side]: next };
+      });
+    }, 200);
+    return () => window.clearInterval(id);
+  }, [tick, resigned, agreedDraw, flagged]);
 
   const applyMove = useCallback(
     (from: Square, to: Square, promotion?: "q" | "r" | "b" | "n") => {
@@ -237,7 +278,7 @@ export function useChessGame() {
   const selectSquare = useCallback(
     (square: Square) => {
       const chess = chessRef.current;
-      if (isThinking || resigned) return;
+      if (isThinking || resigned || flagged) return;
       if (chess.turn() !== playerColor) return;
       const piece = chess.get(square);
 
@@ -282,7 +323,7 @@ export function useChessGame() {
   // AI turn effect
   useEffect(() => {
     const chess = chessRef.current;
-    if (resigned || agreedDraw) return;
+    if (resigned || agreedDraw || flagged) return;
     if (chess.isGameOver()) return;
     if (chess.turn() === playerColor) return;
     if (pendingPromotion) return;
@@ -327,13 +368,13 @@ export function useChessGame() {
     return () => {
       cancelled = true;
     };
-  }, [tick, playerColor, difficulty, pendingPromotion, resigned, agreedDraw, rerender]);
+  }, [tick, playerColor, difficulty, pendingPromotion, resigned, agreedDraw, flagged, rerender]);
 
   // Live evaluation on the player's turn: run a shallow engine analysis in the
   // background whenever the position changes and it's the player's move.
   useEffect(() => {
     const chess = chessRef.current;
-    if (resigned || agreedDraw) return;
+    if (resigned || agreedDraw || flagged) return;
     if (chess.isGameOver()) return;
     if (chess.turn() !== playerColor) return;
     let cancelled = false;
@@ -358,7 +399,7 @@ export function useChessGame() {
     return () => {
       cancelled = true;
     };
-  }, [tick, playerColor, resigned, agreedDraw]);
+  }, [tick, playerColor, resigned, agreedDraw, flagged]);
 
   const newGame = useCallback(
     (opts?: { playerColor?: PlayerColor; difficulty?: Difficulty }) => {
@@ -372,6 +413,8 @@ export function useChessGame() {
       setPendingPromotion(null);
       setResigned(null);
       setAgreedDraw(null);
+      setFlagged(null);
+      setClocks({ w: CLOCK_START_MS, b: CLOCK_START_MS });
       setIsThinking(false);
       setBoardFlipped(false);
       setEngineCp(null);
@@ -405,6 +448,7 @@ export function useChessGame() {
     setPendingPromotion(null);
     setAgreedDraw(null);
     setResigned(null);
+    setFlagged(null);
     rerender();
   }, [isThinking, playerColor, rerender]);
 
@@ -487,6 +531,8 @@ export function useChessGame() {
       setPendingPromotion(null);
       setResigned(null);
       setAgreedDraw(null);
+      setFlagged(null);
+      setClocks({ w: CLOCK_START_MS, b: CLOCK_START_MS });
       setIsThinking(false);
       rerender();
       return { ok: true };
@@ -506,6 +552,8 @@ export function useChessGame() {
         setPendingPromotion(null);
         setResigned(null);
         setAgreedDraw(null);
+        setFlagged(null);
+        setClocks({ w: CLOCK_START_MS, b: CLOCK_START_MS });
         setIsThinking(false);
         rerender();
         return { ok: true };
