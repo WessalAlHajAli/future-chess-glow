@@ -2,9 +2,11 @@ import type { GameState } from "../../hooks/use-chess-game";
 
 interface Props {
   state: GameState;
+  /** When false, live turn/move rows are hidden (used in the side menu). */
+  showLive?: boolean;
 }
 
-export function GameInfoPanel({ state }: Props) {
+export function GameInfoPanel({ state, showLive = true }: Props) {
   const moveNumber = Math.floor(state.history.length / 2) + 1;
   const lastSan = state.history[state.history.length - 1]?.san ?? "—";
   return (
@@ -15,8 +17,8 @@ export function GameInfoPanel({ state }: Props) {
       <dl className="space-y-2 text-sm">
         <Row label="Mode" value="AI Match" />
         <Row label="Difficulty" value={<span className="capitalize">{state.difficulty}</span>} />
-        <Row label="Turn" value={state.turn === "w" ? "White" : "Black"} />
-        <Row label="Move" value={`${moveNumber}. ${lastSan}`} />
+        {showLive && <Row label="Turn" value={state.turn === "w" ? "White" : "Black"} />}
+        {showLive && <Row label="Move" value={`${moveNumber}. ${lastSan}`} />}
       </dl>
     </div>
   );
