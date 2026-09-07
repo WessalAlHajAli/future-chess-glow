@@ -215,6 +215,8 @@ export function useChessGame() {
       pendingPromotion,
       canUndo: history.length > 0 && !isThinking,
       canRedo: redoStackRef.current.length > 0 && !isThinking,
+      clocks,
+      flagged,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -233,7 +235,26 @@ export function useChessGame() {
     engineMate,
     engineDepth,
     engineName,
+    clocks,
+    flagged,
   ]);
+
+  // Chess clock: the side to move burns time until the game ends. Running out
+  // of time loses the game.
+  useEffect(() => {
+    const chess = chessRef.current;
+    if (resigned || agreedDraw || flagged) return;
+    if (chess.isGameOver()) return;
+    const side = chess.turn();
+    const id = window.setInterval(() => {
+      setClocks((c) => {
+        const next = Math.max(0, c[side] - 200);
+        if (next === 0) setFlagged(side);
+        return { ...c, [side]: next };
+      });
+    }, 200);
+    return () => window.clearInterval(id);
+  }, [tick, resigned, agreedDraw, flagged]);
 
   const applyMove = useCallback(
     (from: Square, to: Square, promotion?: "q" | "r" | "b" | "n") => {
