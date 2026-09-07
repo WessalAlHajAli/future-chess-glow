@@ -12,6 +12,9 @@ export interface Preferences {
   showCoordinates: boolean;
   highlightMoves: boolean;
   showLegalMoves: boolean;
+  playerName: string;
+  playerCountry: string;
+  playerAvatar: string; // data URL or empty
 }
 
 export const DEFAULT_PREFS: Preferences = {
@@ -23,7 +26,11 @@ export const DEFAULT_PREFS: Preferences = {
   showCoordinates: true,
   highlightMoves: true,
   showLegalMoves: true,
+  playerName: "You",
+  playerCountry: "",
+  playerAvatar: "",
 };
+
 
 const KEY = "aichess-prefs-v1";
 
