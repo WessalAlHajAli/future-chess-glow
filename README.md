@@ -1,310 +1,83 @@
-# Radiant Chess
+# Future Chess Glow
 
-Create a complete functional 3D AI Chess web game using React, TypeScript, Three.js or React Three Fiber, and chess.js.
+Future Chess Glow is a premium 3D AI-powered chess web application that combines classic chess gameplay with a futuristic, cinematic gaming experience. The application features a straight front-facing 3D chessboard, realistic polished chess pieces, smooth animations, and a dark glassmorphism interface enhanced with subtle golden and atmospheric lighting.
 
-I want you to build the actual working application, not just a visual mockup.
+The project focuses on combining functional chess gameplay with high-quality 3D visuals and a modern responsive user experience.
 
-The main visual style should be inspired by the attached reference images:
+## Key Features
 
-- Premium dark futuristic interface
+* Fully playable chess game against an AI opponent
+* Multiple AI difficulty levels: Easy, Medium, Hard, and Master
+* Legal move validation and chess game-state management
+* Check, checkmate, and stalemate detection
+* Castling, en passant, and pawn promotion
+* Move history and captured pieces
+* Undo, restart, new game, hint, and resign controls
+* Chess clocks for the player and AI
+* Evaluation score and game information
+* Smooth piece movement and capture animations
+* Realistic 3D chess pieces with metallic and ivory materials
+* Straight, front-facing 8×8 chessboard
+* Responsive desktop and mobile interface
 
-- Realistic 3D chess pieces
+## Design
 
-- Polished black metallic pieces
+The visual direction is inspired by premium futuristic gaming interfaces, combining:
 
-- Ivory/white pieces
+* Deep charcoal backgrounds
+* Black glassmorphism panels
+* Champagne-gold accents
+* Dark metallic chess pieces
+* Ivory and pearl-white pieces
+* Soft golden glow
+* Subtle blue and violet atmospheric lighting
+* Realistic shadows and reflections
+* Minimal typography and elegant spacing
+* Smooth transitions and micro-interactions
 
-- Soft golden glow behind the chess pieces and around the board
+A major visual requirement of the project is keeping the chessboard perfectly straight and front-facing. The board does not use tilted, diagonal, isometric, rotated, or slanted perspectives, while the pieces and board still maintain realistic 3D depth.
 
-- Cinematic premium gaming atmosphere
+## Technology
 
-- Minimal and elegant UI
+The application is built using:
 
-IMPORTANT CHESSBOARD REQUIREMENT:
+* React
+* TypeScript
+* Three.js / React Three Fiber
+* chess.js
+* CSS / Tailwind CSS
+* Web Workers
+* Stockfish-ready modular AI architecture
 
-The chessboard MUST be perfectly straight and front-facing.
+The application uses a modular component structure to separate chess logic, 3D rendering, AI behavior, and interface components.
 
-Do NOT use:
+## Responsive Experience
 
-- Tilted perspective
+The interface adapts to desktop, tablet, and mobile screens. On mobile devices, the chessboard remains the main focus and stays perfectly square, while player information, game details, and controls can be organized into collapsible sections or bottom sheets.
 
-- Diagonal board
+## AI Architecture
 
-- Isometric perspective
+The AI system is designed to support different difficulty levels and future chess-engine integration. Stockfish can be integrated through a Web Worker so that AI calculations do not block the main interface or affect the smoothness of the 3D experience.
 
-- Rotated board
+## Project Links
 
-- Slanted board
+**Live Application:** https://future-chess-glow.lovable.app
 
-The board must look like a normal square chessboard viewed directly from the front/top, while still having realistic 3D depth and 3D chess pieces.
+## Getting Started
 
-Create an 8x8 chessboard with:
+### Installation
 
-- Dark charcoal squares
-
-- Warm ivory/gold squares
-
-- Premium beveled frame
-
-- Subtle glowing golden border
-
-- Soft ambient glow behind the board
-
-- Realistic shadows and reflections
-
-3D CHESS PIECES:
-
-Use realistic 3D chess pieces with polished materials.
-
-The pieces should have:
-
-- Realistic 3D geometry
-
-- Smooth surfaces
-
-- Metallic or glossy materials
-
-- Soft shadows
-
-- Subtle rim lighting
-
-- A soft glow around the pieces without making them look neon
-
-The black pieces should be dark metallic charcoal.
-
-The white pieces should be ivory/pearl white with subtle warm reflections.
-
-APPLICATION FEATURES:
-
-Build a real playable chess game against an AI opponent.
-
-Implement:
-
-- Click-to-select pieces
-
-- Legal move validation
-
-- Valid move indicators
-
-- Smooth piece movement animations
-
-- Capturing pieces
-
-- Check detection
-
-- Checkmate detection
-
-- Stalemate detection
-
-- Castling
-
-- En passant
-
-- Pawn promotion
-
-- Move history
-
-- Undo
-
-- New Game
-
-- Resign
-
-- Restart game
-
-AI OPPONENT:
-
-Add difficulty levels:
-
-- Easy
-
-- Medium
-
-- Hard
-
-- Master
-
-The AI should make a move after the player moves.
-
-Use a modular AI system so a chess engine such as Stockfish can be integrated later.
-
-If Stockfish is possible in the browser, implement it using a Web Worker to avoid blocking the UI.
-
-USER INTERFACE:
-
-Create a premium responsive layout.
-
-Desktop:
-
-- Large centered straight chessboard
-
-- Player information on the left
-
-- AI opponent information on the right
-
-- Game controls below the board
-
-Player panel:
-
-- Avatar
-
-- Name: You
-
-- ELO rating
-
-- Chess clock
-
-- Current turn
-
-AI panel:
-
-- AI avatar
-
-- Name: AI Master
-
-- ELO rating
-
-- Chess clock
-
-- Difficulty
-
-Additional panels:
-
-- Move history
-
-- Captured pieces
-
-- Game information
-
-- Evaluation score
-
-Bottom controls:
-
-- New Game
-
-- Undo
-
-- Hint
-
-- Settings
-
-- Resign
-
-VISUAL DESIGN:
-
-Use a dark premium theme:
-
-- Deep charcoal background
-
-- Black glassmorphism panels
-
-- Champagne gold primary accent
-
-- Very subtle blue/violet atmospheric glow
-
-- Warm white typography
-
-- Soft gray secondary text
-
-Use:
-
-- Glassmorphism
-
-- Subtle borders
-
-- Premium spacing
-
-- Rounded corners
-
-- Smooth animations
-
-- Hover states
-
-- Micro-interactions
-
-RESPONSIVE DESIGN:
-
-On mobile:
-
-- Keep the chessboard perfectly square
-
-- Keep the board as the main focus
-
-- Move side panels into collapsible sections or bottom sheets
-
-- Make all controls touch-friendly
-
-TECHNICAL REQUIREMENTS:
-
-Use:
-
-- React
-
-- TypeScript
-
-- Three.js or React Three Fiber
-
-- chess.js
-
-- CSS or Tailwind CSS
-
-- Modular reusable components
-
-Create components such as:
-
-- ChessGame
-
-- ChessBoard
-
-- ChessPiece3D
-
-- PlayerPanel
-
-- AIOpponentPanel
-
-- MoveHistory
-
-- CapturedPieces
-
-- GameControls
-
-- SettingsModal
-
-Start by building the complete working application and make sure the chess game is functional before adding advanced visual polish.
-
-Prioritize:
-
-1. Functional chess gameplay
-
-2. Straight front-facing 3D chessboard
-
-3. High-quality 3D chess pieces
-
-4. Soft glow behind the pieces and board
-
-5. Premium dark futuristic UI
-
-6. Responsive design
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://future-chess-glow.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/876dcc1c-5df2-4c30-9be7-301d417b4089).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
+```bash
 git clone <this-repository-url>
 cd <repository-name>
-npm i
+npm install
+```
+
+### Development
+
+```bash
 npm run dev
 ```
+
+The application can be developed locally using Node.js and npm.
+
