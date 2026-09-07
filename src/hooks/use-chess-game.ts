@@ -175,7 +175,10 @@ export function useChessGame() {
     let finalStatus: GameStatus = status;
     let finalWinner = winner;
     let finalDraw = drawReason;
-    if (resigned) {
+    if (flagged) {
+      finalStatus = "timeout";
+      finalWinner = flagged === "w" ? "b" : "w";
+    } else if (resigned) {
       finalStatus = "resigned";
       finalWinner = resigned === "w" ? "b" : "w";
     } else if (agreedDraw) {
