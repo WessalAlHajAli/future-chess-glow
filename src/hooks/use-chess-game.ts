@@ -149,6 +149,11 @@ export function useChessGame() {
   const [engineMate, setEngineMate] = useState<number | null>(null);
   const [engineDepth, setEngineDepth] = useState<number | null>(null);
   const [engineName, setEngineName] = useState<string>("AI Engine");
+  const [clocks, setClocks] = useState<{ w: number; b: number }>({
+    w: CLOCK_START_MS,
+    b: CLOCK_START_MS,
+  });
+  const [flagged, setFlagged] = useState<PlayerColor | null>(null);
 
   // Kick off engine load once so it's warm by the time AI needs to move.
   useEffect(() => {
